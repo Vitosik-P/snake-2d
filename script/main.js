@@ -22,6 +22,13 @@ let berry = {
     y: 0,
 }
 
+let blueBerry = {
+    x: 0,
+    y: 0,
+    kof: 5,
+    state: 0,
+}
+
 let canvas = document.querySelector('#game-canvas');
 let context = canvas.getContext('2d');
 scoreBlock = document.querySelector('.game-score .score-count');
@@ -37,10 +44,12 @@ function gameLoop(){
 
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawberry();
+    drawBerry();
+    drawBlueBerry();
     drawSnake();
 }
 requestAnimationFrame(gameLoop);
+randomPositionBerry();
 
 function drawSnake(){
     snake.x += snake.dx;
@@ -67,6 +76,13 @@ function drawSnake(){
             snake.maxTails++;
             inScore();
             randomPositionBerry();
+            blueBerryNewState();
+        }
+        else if (el.x === blueBerry.x && el.y === blueBerry.y){
+            snake.maxTails -= 2;
+            downScore();
+            randomPositionBlueBerry();
+            blueBerryNewState();
         }
 
         for (let i = index + 1; i < snake.tails.length; i++){
@@ -74,7 +90,6 @@ function drawSnake(){
                 refresGame();
             }
         }
-
     });
 }
 
@@ -108,11 +123,20 @@ function refresGame(){
 
 }
 
-function drawberry(){
+function drawBerry(){
     context.beginPath();
     context.fillStyle = "#A00034"
     context.arc(berry.x + (config.sizeCell / 2), berry.y + (config.sizeCell / 2), config.sizeberry, 0, 2  * Math.PI);
     context.fill();
+}
+
+function drawBlueBerry(){
+    if (blueBerry.state === 1){
+        context.beginPath();
+        context.fillStyle = "#4AC0BC"
+        context.arc(blueBerry.x + (config.sizeCell / 2), blueBerry.y + (config.sizeCell / 2), config.sizeberry, 0, 2  * Math.PI);
+        context.fill();
+    }
 }
 
 function randomPositionBerry(){
@@ -120,8 +144,31 @@ function randomPositionBerry(){
     berry.y = getRandomInt(0, canvas.height / config.sizeCell) * config.sizeCell;
 }
 
+function randomPositionBlueBerry(){
+    if (blueBerry.state === 1){
+        blueBerry.x = getRandomInt(0, canvas.width / config.sizeCell) * config.sizeCell;
+        blueBerry.y = getRandomInt(0, canvas.height / config.sizeCell) * config.sizeCell;
+    }
+    else {
+        blueBerry.x = -1000;
+        blueBerry.y = -1000;
+    }
+    if (blueBerry.x === berry.x && blueBerry.y === berry.y){
+        randomPositionBerry();
+    }
+}
+
+function blueBerryNewState(){
+    blueBerry.state = getRandomInt(0, blueBerry.kof);
+}
+
 function inScore() {
     score++;
+    drawScore();
+}
+
+function downScore() {
+    score--;
     drawScore();
 }
 
